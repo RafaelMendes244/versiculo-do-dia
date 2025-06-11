@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versículo do Dia</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Versículo do Dia</h1>
+            <div class="theme-switch">
+                <i class="fas fa-sun"></i>
+                <label class="switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="slider round"></span>
+                </label>
+                <i class="fas fa-moon"></i>
+            </div>
+        </div>
+        
+        <div class="verse-box">
+            <div class="verse-icon"><i class="fas fa-book-bible"></i></div>
+            <p id="verseText">Carregando versículo...</p>
+            <p id="verseReference"></p>
+            <div class="verse-actions">
+                <button id="newVerseBtn" class="btn-primary">
+                    <i class="fas fa-sync-alt"></i> Novo Versículo
+                </button>
+                <button id="shareVerseBtn" class="btn-secondary">
+                    <i class="fas fa-share-alt"></i> Compartilhar
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Feito com <i class="fas fa-heart"></i> e fé</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
