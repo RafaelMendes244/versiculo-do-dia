@@ -8,8 +8,6 @@ Um projeto web simples que exibe um versículo bíblico do dia, desenvolvido com
 
 Acesse: [versiculodia-eta.vercel.app](https://versiculodia-eta.vercel.app/)
 
-![Screenshot do Versículo do Dia](./screenshot.png)
-
 ## Funcionalidades
 
 - Exibe um versículo bíblico diferente a cada dia.
