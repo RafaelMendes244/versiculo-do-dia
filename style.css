@@ -1,22 +1,22 @@
 :root {
     /* Cores do tema claro */
-    --primary-color: #6a0572; /* Roxo vibrante (pode ser um azul celestial também: #3498db) */
-    --secondary-color: #92229b; /* Roxo mais escuro para hover */
-    --text-color: #333;
-    --bg-color: #fce4ec; /* Rosa claro ou azul claro: #e0f2f7 */
-    --card-color: #ffffff;
-    --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
+    --cor-primaria: #6a0572;
+    --cor-secundaria: #92229b;
+    --cor-texto: #333;
+    --cor-fundo: #fce4ec;
+    --cor-cartao: #ffffff;
+    --sombra: 0 10px 20px rgba(0, 0, 0, 0.1);
+    --transicao: all 0.3s ease;
 }
 
 /* Tema escuro */
-[data-theme="dark"] {
-    --primary-color: #bb86fc; /* Roxo claro para o dark mode ou azul claro: #81d4fa */
-    --secondary-color: #3700b3; /* Roxo mais escuro para hover ou azul escuro: #01579b */
-    --text-color: #f8f9fa;
-    --bg-color: #1a1a1a; /* Cinza bem escuro */
-    --card-color: #2c2c2c; /* Cinza médio */
-    --shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+[data-tema="escuro"] {
+    --cor-primaria: #bb86fc;
+    --cor-secundaria: #3700b3;
+    --cor-texto: #f8f9fa;
+    --cor-fundo: #1a1a1a;
+    --cor-cartao: #2c2c2c;
+    --sombra: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 * {
@@ -27,9 +27,9 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    transition: var(--transition);
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    transition: var(--transicao);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -38,13 +38,13 @@ body {
     line-height: 1.6;
 }
 
-.container {
+.conteiner {
     width: 100%;
     max-width: 800px;
     padding: 0 20px;
 }
 
-.header {
+.cabecalho {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -54,30 +54,29 @@ body {
 h1 {
     font-size: 2.2rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--cor-primaria);
 }
 
-.theme-switch {
+.alternador-tema {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Estilo do toggle de tema */
-.switch {
+.interruptor {
     position: relative;
     display: inline-block;
     width: 60px;
     height: 30px;
 }
 
-.switch input {
+.interruptor input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.slider {
+.controle-deslizante {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -85,11 +84,11 @@ h1 {
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    transition: var(--transition);
+    transition: var(--transicao);
     border-radius: 34px;
 }
 
-.slider:before {
+.controle-deslizante:before {
     position: absolute;
     content: "";
     height: 22px;
@@ -97,61 +96,60 @@ h1 {
     left: 4px;
     bottom: 4px;
     background-color: white;
-    transition: var(--transition);
+    transition: var(--transicao);
     border-radius: 50%;
 }
 
-input:checked + .slider {
-    background-color: var(--primary-color);
+input:checked + .controle-deslizante {
+    background-color: var(--cor-primaria);
 }
 
-input:checked + .slider:before {
+input:checked + .controle-deslizante:before {
     transform: translateX(30px);
 }
 
-/* Estilo da caixa de versículo */
-.verse-box { /* Novo nome de classe */
-    background-color: var(--card-color);
+.caixa-versiculo {
+    background-color: var(--cor-cartao);
     border-radius: 15px;
     padding: 40px;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+    box-shadow: var(--sombra);
+    transition: var(--transicao);
     position: relative;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 250px; /* Garante um tamanho mínimo */
+    min-height: 250px;
 }
 
-.verse-icon { /* Novo nome de classe */
+.icone-versiculo {
     font-size: 3rem;
-    color: var(--primary-color);
+    color: var(--cor-primaria);
     opacity: 0.3;
     margin-bottom: 20px;
 }
 
-#verseText { /* Novo ID */
+#textoVersiculo {
     font-size: 1.8rem;
     font-weight: 300;
     font-style: italic;
-    margin-bottom: 15px; /* Mais espaço para a referência */
+    margin-bottom: 15px;
     line-height: 1.5;
     opacity: 0;
-    animation: fadeIn 0.5s ease-in-out forwards;
+    animation: aparecer 0.5s ease-in-out forwards;
 }
 
-#verseReference { /* Novo ID para a referência */
+#referenciaVersiculo {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--cor-primaria);
     margin-bottom: 30px;
     opacity: 0;
-    animation: fadeIn 0.5s ease-in-out 0.2s forwards; /* Pequeno delay para a referência */
+    animation: aparecer 0.5s ease-in-out 0.2s forwards;
 }
 
-@keyframes fadeIn {
+@keyframes aparecer {
     from {
         opacity: 0;
         transform: translateY(10px);
@@ -162,137 +160,131 @@ input:checked + .slider:before {
     }
 }
 
-.verse-actions { /* Novo nome de classe */
+.acoes-versiculo {
     display: flex;
     justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
 }
 
-/* Estilo dos botões */
-.btn-primary, .btn-secondary {
+.botao-primario, .botao-secundario {
     padding: 12px 25px;
     border: none;
     border-radius: 50px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: var(--transicao);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.btn-primary {
-    background-color: var(--primary-color);
+.botao-primario {
+    background-color: var(--cor-primaria);
     color: white;
 }
 
-.btn-primary:hover {
-    background-color: var(--secondary-color);
+.botao-primario:hover {
+    background-color: var(--cor-secundaria);
     transform: translateY(-2px);
 }
 
-.btn-secondary {
+.botao-secundario {
     background-color: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
+    color: var(--cor-primaria);
+    border: 2px solid var(--cor-primaria);
 }
 
-.btn-secondary:hover {
-    background-color: var(--primary-color);
+.botao-secundario:hover {
+    background-color: var(--cor-primaria);
     color: white;
     transform: translateY(-2px);
 }
 
-/* Rodapé */
-.footer {
+.rodape {
     margin-top: 40px;
     text-align: center;
     font-size: 0.9rem;
     opacity: 0.7;
 }
 
-.footer i {
-    color: #ff6b6b; /* Coração vermelho */
+.rodape i {
+    color: #ff6b6b;
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     h1 {
         font-size: 1.8rem;
     }
     
-    .verse-box { /* Novo nome de classe */
+    .caixa-versiculo {
         padding: 30px 20px;
     }
     
-    #verseText { /* Novo ID */
+    #textoVersiculo {
         font-size: 1.4rem;
     }
     
-    #verseReference { /* Novo ID */
+    #referenciaVersiculo {
         font-size: 1rem;
     }
     
-    .btn-primary, .btn-secondary {
+    .botao-primario, .botao-secundario {
         padding: 10px 20px;
         font-size: 0.9rem;
     }
 }
 
 @media (max-width: 480px) {
-    .header {
+    .cabecalho {
         flex-direction: column;
         gap: 15px;
     }
     
-    .verse-actions { /* Novo nome de classe */
+    .acoes-versiculo {
         flex-direction: column;
     }
     
-    .btn-primary, .btn-secondary {
+    .botao-primario, .botao-secundario {
         width: 100%;
         justify-content: center;
     }
     
-    .verse-box {
+    .caixa-versiculo {
         min-height: 200px;
     }
 }
 
-/* Toast notification */
-.toast {
+.notificacao {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--primary-color);
+    background-color: var(--cor-primaria);
     color: white;
     padding: 12px 24px;
     border-radius: 50px;
-    box-shadow: var(--shadow);
+    box-shadow: var(--sombra);
     opacity: 0;
     transition: opacity 0.3s ease;
     z-index: 1000;
 }
 
-.toast.show {
+.notificacao.mostrar {
     opacity: 1;
 }
 
-/* Melhorias na animação de loading */
-@keyframes pulse {
+@keyframes pulsar {
     0% { opacity: 0.6; }
     50% { opacity: 1; }
     100% { opacity: 0.6; }
 }
 
-#verseText[textContent="Carregando versículo..."] {
-    animation: pulse 1.5s infinite ease-in-out;
+#textoVersiculo[textContent="Carregando versículo..."] {
+    animation: pulsar 1.5s infinite ease-in-out;
 }
 
-/* Melhorias no botão desabilitado */
 button:disabled {
     opacity: 0.7;
     cursor: not-allowed;

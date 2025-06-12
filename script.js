@@ -1,38 +1,40 @@
-const BIBLE_API_URL = 'https://bible-api.com/?random=verse'; // Busca um versículo aleatório em inglês
-const MYMEMORY_API_URL = 'https://api.mymemory.translated.net/get'; // Para tradução
+// URLs das APIs utilizadas
+const URL_API_BIBLIA = 'https://bible-api.com/?random=verse';
+const URL_API_TRADUCAO = 'https://api.mymemory.translated.net/get';
 
-const verseTextElement = document.getElementById('verseText');
-const verseReferenceElement = document.getElementById('verseReference');
-const newVerseBtn = document.getElementById('newVerseBtn');
-const shareVerseBtn = document.getElementById('shareVerseBtn');
-const themeToggle = document.getElementById('themeToggle');
+// Elementos da página
+const elementoTextoVersiculo = document.getElementById('textoVersiculo');
+const elementoReferenciaVersiculo = document.getElementById('referenciaVersiculo');
+const botaoNovoVersiculo = document.getElementById('botaoNovoVersiculo');
+const botaoCompartilhar = document.getElementById('botaoCompartilhar');
+const alternadorTema = document.getElementById('alternadorTema');
 
-// Versículos locais para fallback (em português, caso as APIs falhem)
-const localVerses = [
+// Lista de versículos para fallback
+const versiculosLocais = [
     {
-        text: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",
-        reference: "João 3:16"
+        texto: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",
+        referencia: "João 3:16"
     },
     {
-        text: "Tudo posso naquele que me fortalece.",
-        reference: "Filipenses 4:13"
+        texto: "Tudo posso naquele que me fortalece.",
+        referencia: "Filipenses 4:13"
     },
     {
-        text: "O Senhor é o meu pastor; nada me faltará.",
-        reference: "Salmos 23:1"
+        texto: "O Senhor é o meu pastor; nada me faltará.",
+        referencia: "Salmos 23:1"
     },
     {
-        text: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei.",
-        reference: "Mateus 11:28"
+        texto: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei.",
+        referencia: "Mateus 11:28"
     },
     {
-        text: "Em tudo dai graças, porque esta é a vontade de Deus em Cristo Jesus para convosco.",
-        reference: "1 Tessalonicenses 5:18"
+        texto: "Em tudo dai graças, porque esta é a vontade de Deus em Cristo Jesus para convosco.",
+        referencia: "1 Tessalonicenses 5:18"
     }
 ];
 
-// Mapeamento de nomes de livros do inglês para o português
-const bookNameMap = {
+// Mapeamento de nomes de livros (inglês -> português)
+const mapaNomesLivros = {
     "Genesis": "Gênesis",
     "Exodus": "Êxodo",
     "Leviticus": "Levítico",
@@ -101,191 +103,146 @@ const bookNameMap = {
     "Revelation": "Apocalipse"
 };
 
-
-// Função principal para buscar e traduzir o versículo
-async function fetchAndTranslateVerse() {
-    verseTextElement.textContent = "Carregando versículo...";
-    verseReferenceElement.textContent = "";
-    newVerseBtn.disabled = true;
-    shareVerseBtn.disabled = true;
+// Função principal para buscar e exibir o versículo
+async function buscarVersiculo() {
+    elementoTextoVersiculo.textContent = "Carregando versículo...";
+    elementoReferenciaVersiculo.textContent = "";
+    botaoNovoVersiculo.disabled = true;
+    botaoCompartilhar.disabled = true;
 
     try {
-        // 1. Buscar versículo em inglês da Bible API
-        console.log("Tentando buscar versículo da Bible API (em inglês)...");
-        const verseResponse = await fetch(BIBLE_API_URL);
-        if (!verseResponse.ok) {
-            throw new Error(`Erro ao buscar versículo (Bible API): ${verseResponse.status} - ${verseResponse.statusText}`);
-        }
-        const verseData = await verseResponse.json();
-        console.log("Dados da Bible API recebidos:", verseData);
-
-        // A Bible API retorna o versículo em 'text' e a referência em 'reference'
-        const englishVerseText = verseData.text;
-        const englishVerseReference = verseData.reference;
-        console.log(`Versículo em inglês: ${englishVerseText} (${englishVerseReference})`);
-
-
-        // 2. Traduzir o texto do versículo para português via MyMemory API
-        console.log("Tentando traduzir texto do versículo...");
-        const translatedVerseText = await translateText(englishVerseText, 'en|pt');
-        console.log("Texto traduzido:", translatedVerseText);
+        // Busca o versículo em inglês
+        const resposta = await fetch(URL_API_BIBLIA);
+        if (!resposta.ok) throw new Error("Erro ao buscar versículo");
         
-        // 3. Traduzir a referência usando o mapeamento manual
-        const correctedReference = translateReference(englishVerseReference);
-        console.log("Referência corrigida:", correctedReference);
+        const dados = await resposta.json();
+        const textoIngles = dados.text;
+        const referenciaIngles = dados.reference;
 
+        // Traduz o texto
+        const textoTraduzido = await traduzirTexto(textoIngles, 'en|pt');
+        
+        // Corrige a referência
+        const referenciaTraduzida = traduzirReferencia(referenciaIngles);
 
-        verseTextElement.textContent = `"${translatedVerseText.trim()}"`; // .trim() para remover espaços extras
-        verseReferenceElement.textContent = correctedReference;
+        // Atualiza a página
+        elementoTextoVersiculo.textContent = `"${textoTraduzido.trim()}"`;
+        elementoReferenciaVersiculo.textContent = referenciaTraduzida;
 
-    } catch (error) {
-        console.error("ERRO GERAL no processo de busca ou tradução do versículo:", error);
-        useLocalVerse(); // Em caso de erro, usa um versículo local
+    } catch (erro) {
+        console.error("Erro:", erro);
+        usarVersiculoLocal();
     } finally {
-        newVerseBtn.disabled = false;
-        shareVerseBtn.disabled = false;
-        animateVerse(); // Chama a animação
+        botaoNovoVersiculo.disabled = false;
+        botaoCompartilhar.disabled = false;
+        animarVersiculo();
     }
 }
 
-// Função para traduzir texto usando MyMemory API
-async function translateText(text, langpair) {
+// Função para traduzir texto
+async function traduzirTexto(texto, parIdiomas) {
     try {
-        const encodedText = encodeURIComponent(text);
-        const url = `${MYMEMORY_API_URL}?q=${encodedText}&langpair=${langpair}`;
-        // Se a MyMemory API reclamar de limite de IP ou precisar de chave, descomente e adicione sua chave:
-        // const url = `${MYMEMORY_API_URL}?q=${encodedText}&langpair=${langpair}&key=SUA_CHAVE_MYMEMORY_AQUI`;
-
-        const response = await fetch(url);
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`Erro na API MyMemory: ${response.status} - ${response.statusText}. Detalhes: ${JSON.stringify(errorData)}`);
-        }
-        const data = await response.json();
-        if (data && data.responseData && data.responseData.translatedText) {
-            return data.responseData.translatedText;
-        } else {
-            console.warn("MyMemory API não retornou tradução. Usando texto original.");
-            return text;
-        }
-    } catch (error) {
-        console.error("Erro na tradução do texto:", error);
-        return text; // Retorna o texto original em caso de erro
+        const resposta = await fetch(`${URL_API_TRADUCAO}?q=${encodeURIComponent(texto)}&langpair=${parIdiomas}`);
+        if (!resposta.ok) throw new Error("Erro na tradução");
+        
+        const dados = await resposta.json();
+        return dados.responseData?.translatedText || texto;
+    } catch (erro) {
+        console.error("Erro na tradução:", erro);
+        return texto;
     }
 }
 
-// Função para traduzir a referência do versículo usando o mapeamento manual
-function translateReference(englishReference) {
-    // Regex para encontrar o nome do livro no início da referência (ex: "John 3:16" -> "John")
-    // Também trata casos como "1 Corinthians" ou "2 Kings"
-    // Captura o nome completo do livro (com ou sem número)
-    const bookNameMatch = englishReference.match(/^(\d?\s?[a-zA-Z\s]+?)\s+\d+:\d+/);
+// Função para traduzir referência
+function traduzirReferencia(referencia) {
+    const regex = /^(\d?\s?[a-zA-Z\s]+?)\s+\d+:\d+/;
+    const resultado = referencia.match(regex);
     
-    if (bookNameMatch && bookNameMatch[1]) {
-        let englishBookName = bookNameMatch[1].trim();
-        
-        // Ajuste para "Song of Solomon" que vem sem espaço e é longo
-        if (englishBookName.includes("SongofSolomon")) {
-            englishBookName = "Song of Solomon";
-        }
-
-        const translatedBookName = bookNameMap[englishBookName] || englishBookName; // Tenta traduzir, se não, usa original
-        
-        // Substitui o nome do livro original pelo traduzido e mantém o resto da referência
-        // Usa uma regex mais robusta para substituir apenas o nome do livro no início
-        return englishReference.replace(new RegExp(`^${escapeRegExp(englishBookName)}\\s*`), `${translatedBookName} `);
+    if (resultado && resultado[1]) {
+        const livroIngles = resultado[1].trim();
+        const livroPortugues = mapaNomesLivros[livroIngles] || livroIngles;
+        return referencia.replace(livroIngles, livroPortugues);
     }
-    return englishReference; // Retorna a referência original se não encontrar nome do livro
+    return referencia;
 }
 
-// Função auxiliar para escapar caracteres especiais em regex
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+// Função para usar versículo local
+function usarVersiculoLocal() {
+    const indice = Math.floor(Math.random() * versiculosLocais.length);
+    elementoTextoVersiculo.textContent = `"${versiculosLocais[indice].texto}"`;
+    elementoReferenciaVersiculo.textContent = versiculosLocais[indice].referencia;
 }
 
+// Função para animar o versículo
+function animarVersiculo() {
+    elementoTextoVersiculo.classList.remove('aparecer');
+    void elementoTextoVersiculo.offsetWidth;
+    elementoTextoVersiculo.classList.add('aparecer');
 
-// Função para usar um versículo local (fallback)
-function useLocalVerse() {
-    const randomIndex = Math.floor(Math.random() * localVerses.length);
-    verseTextElement.textContent = `"${localVerses[randomIndex].text}"`;
-    verseReferenceElement.textContent = localVerses[randomIndex].reference;
-    console.warn("Usando versículo local devido a erro na API.");
+    elementoReferenciaVersiculo.classList.remove('aparecer');
+    void elementoReferenciaVersiculo.offsetWidth;
+    elementoReferenciaVersiculo.classList.add('aparecer');
 }
 
-// Função para animar a transição do versículo
-function animateVerse() {
-    verseTextElement.classList.remove('fade-in');
-    void verseTextElement.offsetWidth; 
-    verseTextElement.classList.add('fade-in');
-
-    verseReferenceElement.classList.remove('fade-in');
-    void verseReferenceElement.offsetWidth;
-    verseReferenceElement.classList.add('fade-in');
-}
-
-// Função para compartilhar o versículo
-function shareVerse() {
-    const currentVerse = verseTextElement.textContent;
-    const currentReference = verseReferenceElement.textContent;
-    const shareText = `Versículo do Dia: ${currentVerse} ${currentReference} #VersiculoDoDia`;
-
+// Função para compartilhar
+function compartilharVersiculo() {
+    const texto = `${elementoTextoVersiculo.textContent} ${elementoReferenciaVersiculo.textContent}`;
+    
     if (navigator.share) {
         navigator.share({
             title: 'Versículo do Dia',
-            text: shareText,
+            text: texto,
             url: window.location.href
-        }).catch(err => {
-            console.log('Erro ao compartilhar via Web Share API:', err);
-            copyToClipboard();
+        }).catch(erro => {
+            console.error("Erro ao compartilhar:", erro);
+            copiarTexto(texto);
         });
     } else {
-        copyToClipboard();
+        copiarTexto(texto);
     }
 }
 
-// Função para copiar o versículo para a área de transferência
-function copyToClipboard() {
-    const textToCopy = `${verseTextElement.textContent} ${verseReferenceElement.textContent}`;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Versículo copiado para a área de transferência!');
-    }).catch(err => {
-        console.error('Erro ao copiar:', err);
-        const textarea = document.createElement('textarea');
-        textarea.value = textToCopy;
-        document.body.appendChild(textarea);
-        textarea.select();
+// Função para copiar texto
+function copiarTexto(texto) {
+    navigator.clipboard.writeText(texto).then(() => {
+        alert("Versículo copiado!");
+    }).catch(() => {
+        const area = document.createElement('textarea');
+        area.value = texto;
+        document.body.appendChild(area);
+        area.select();
         document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('Versículo copiado para a área de transferência! (Fallback)');
+        document.body.removeChild(area);
+        alert("Versículo copiado!");
     });
 }
 
-// Função para alternar entre os temas claro e escuro
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
+// Função para alternar tema
+function alternarTema() {
+    const temaAtual = document.documentElement.getAttribute('data-tema');
+    if (temaAtual === 'escuro') {
+        document.documentElement.removeAttribute('data-tema');
+        localStorage.setItem('tema', 'claro');
     } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
+        document.documentElement.setAttribute('data-tema', 'escuro');
+        localStorage.setItem('tema', 'escuro');
     }
 }
 
-// Função para verificar o tema salvo no localStorage ao carregar a página
-function checkSavedTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.checked = true;
+// Função para verificar tema salvo
+function verificarTema() {
+    const temaSalvo = localStorage.getItem('tema');
+    if (temaSalvo === 'escuro') {
+        document.documentElement.setAttribute('data-tema', 'escuro');
+        alternadorTema.checked = true;
     }
 }
 
-// Adiciona os event listeners
-newVerseBtn.addEventListener('click', fetchAndTranslateVerse);
-shareVerseBtn.addEventListener('click', shareVerse);
-themeToggle.addEventListener('change', toggleTheme);
+// Eventos
+botaoNovoVersiculo.addEventListener('click', buscarVersiculo);
+botaoCompartilhar.addEventListener('click', compartilharVersiculo);
+alternadorTema.addEventListener('change', alternarTema);
 
-// Chamadas iniciais ao carregar a página
-checkSavedTheme(); // Aplica o tema salvo
-fetchAndTranslateVerse(); // Busca o primeiro versículo ao carregar
+// Inicialização
+verificarTema();
+buscarVersiculo();
